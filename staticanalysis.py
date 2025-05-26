@@ -35,7 +35,7 @@ for alg in algs:
         allkeys.update(stat.keys())
 
 allkeys = list(allkeys)
-print("\t\t" + "\t\t".join(algs))
+print("\t" + "\t\t\t".join(algs))
 print("\tpython\tjava\tc\t"*3)
 for key in allkeys:
     print(key, end="\t")
