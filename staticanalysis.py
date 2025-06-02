@@ -10,37 +10,43 @@ for alg in algs:
         stat = defaultdict(lambda:0)
         with open("algorithms/"+alg+"."+lang) as f:
             contents = f.read()
+            stat["total"] = len(contents)
             for char in contents:
-                if char in "1234567890":
-                    stat["digit"] += 1
-                elif char in "qwertyuiopasdfghjklzxcvbnm":
-                    stat["letter"] += 1
-                elif char in "QWERTYUIOPASDFGHJKLZXCVBNM":
-                    stat["LETTER"] += 1
-                elif char == "\n":
-                    stat["newline"] += 1
-                elif char == " ":
-                    stat["space"] += 1
-                elif char == "\t":
-                    stat["tab"] += 1
-                elif char in "()[]{}":
-                    stat["()[]{}"] += 1
-                elif char in "?%#&":
-                    stat["?%#&"] += 1
-                elif char in "><=":
-                    stat["<>="] += 1
+                if char in "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM":
+                    stat["alphnumeric"] += 1
+                elif char in " \n":
+                    stat["whitespace"] += 1
                 else:
-                    stat[char] += 1
+                    stat["special"] += 1
+                    if char in "()[]{}":
+                        stat["()[]{}"] += 1
+                    elif char in "?%#&":
+                        stat["?%#&"] += 1
+                    elif char in "><=":
+                        stat["<>="] += 1
+                    else:
+                        stat[char] += 1
         stats[alg][lang] = stat
         allkeys.update(stat.keys())
 
-allkeys = list(allkeys)
-print("\t" + "\t\t\t".join(algs))
-print("\tpython\tjava\tc\t"*3)
+allkeys = list(sorted(allkeys - {"total"}))
+# print("\t" + "\t\t\t".join(algs))
+print("\tpython\tjava\tc\t")
+
+
+## Prints the data formatted for a Typst table
+
+print("    [total],", end="")
+for lang in ["py", "java", "c"]:
+    print(" [" + str(sum([stats[alg][lang]["total"] for alg in algs])) + "],", end='')
+# print("", end="\t")
+print()
+
 for key in allkeys:
-    print(key, end="\t")
-    for alg in algs:
-        for lang in ["py", "java", "c"]:
-            print(stats[alg][lang][key], end='\t')
-        print("", end="\t")
+    print("    ["+key+"],", end="")
+    for lang in ["py", "java", "c"]:
+        count = sum([stats[alg][lang][key] for alg in algs])
+        total = sum([stats[alg][lang]["total"] for alg in algs])
+        print(f" [{count} \\ ({(100 * count / total):.1f}%)],", end='')
+    # print("", end="\t")
     print()
